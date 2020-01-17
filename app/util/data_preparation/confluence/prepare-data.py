@@ -49,7 +49,9 @@ def __get_pages(confluence_api, count):
         0, count, cql='type=page'
                       ' and title !~ JMeter'      # filter out pages created by JMeter
                       ' and title !~ Selenium'    # filter out pages created by Selenium
-                      ' and title !~ Home')       # filter out space Home pages
+                      ' and title !~ Home'        # filter out space Home pages
+                      # filter out themepressdefault space as perf users do not have access to this space
+                      ' and space != themepressdefault')
     if not pages:
         raise SystemExit(f"There is no Pages in Confluence")
 

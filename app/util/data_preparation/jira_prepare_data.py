@@ -7,7 +7,7 @@ import urllib3
 from util.conf import JIRA_SETTINGS
 from util.api.jira_clients import JiraRestClient
 from util.project_paths import JIRA_DATASET_JQLS, JIRA_DATASET_SCRUM_BOARDS, JIRA_DATASET_KANBAN_BOARDS, \
-    JIRA_DATASET_USERS, JIRA_DATASET_ISSUES, JIRA_DATASET_PROJECTS
+    JIRA_DATASET_USERS, JIRA_DATASET_ISSUES, JIRA_DATASET_PROJECTS, JIRA_DATASET_SPRINTS
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -17,6 +17,7 @@ USERS = "users"
 ISSUES = "issues"
 JQLS = "jqls"
 PROJECTS = "projects"
+SPRINTS = "sprints"
 
 DEFAULT_USER_PASSWORD = 'password'
 DEFAULT_USER_PREFIX = 'performance_'
@@ -81,6 +82,9 @@ def write_test_data_to_files(datasets):
     keys = datasets[PROJECTS]
     __write_to_file(JIRA_DATASET_PROJECTS, keys)
 
+    sprints = [f"{sprint['sprint_id']},{sprint['board_id']}" for sprint in datasets[SPRINTS]]
+    __write_to_file(JIRA_DATASET_SPRINTS, sprints)
+
 
 def __write_to_file(file_path, items):
     with open(file_path, 'w') as f:
@@ -95,6 +99,7 @@ def __create_data_set(jira_api):
     dataset[PROJECTS] = software_projects
     dataset[ISSUES] = __get_issues(jira_api, software_projects)
     dataset[SCRUM_BOARDS] = __get_boards(jira_api, 'scrum')
+    dataset[SPRINTS] = __get_sprints(jira_api, dataset[SCRUM_BOARDS])
     dataset[KANBAN_BOARDS] = __get_boards(jira_api, 'kanban')
     dataset[JQLS] = __generate_jqls(count=150)
     print(f'Users count: {len(dataset[USERS])}')
@@ -125,6 +130,19 @@ def __get_boards(jira_api, board_type):
         raise SystemExit(f"There are no {board_type} boards in Jira")
 
     return boards
+
+
+def __get_sprints(jira_api, boards):
+    sprints = []
+    for board in boards:
+        board_sprints = jira_api.get_sprints(board['id'])
+        for sprint in board_sprints:
+            sprints.append({'sprint_id': sprint['id'], 'board_id': board['id']})
+
+    if not sprints:
+        raise SystemExit("There are no active sprints in Jira")
+
+    return sprints
 
 
 def __get_users(jira_api):

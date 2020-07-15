@@ -61,6 +61,7 @@ JIRA_DATASET_KANBAN_BOARDS = __get_jira_dataset('kanban-boards.csv')
 JIRA_DATASET_USERS = __get_jira_dataset('users.csv')
 JIRA_DATASET_ISSUES = __get_jira_dataset('issues.csv')
 JIRA_DATASET_PROJECTS = __get_jira_dataset('projects.csv')
+JIRA_DATASET_SPRINTS = __get_jira_dataset('sprints.csv')
 
 CONFLUENCE_YML = __get_confluence_yml()
 CONFLUENCE_DATASETS = __get_confluence_datasets()

@@ -74,6 +74,7 @@ BITBUCKET_DATASETS = __get_bitbucket_datasets()
 BITBUCKET_USERS = __get_bitbucket_dataset('users.csv')
 BITBUCKET_PROJECTS = __get_bitbucket_dataset('projects.csv')
 BITBUCKET_REPOS = __get_bitbucket_dataset('repos.csv')
+BITBUCKET_REPOS_APP = __get_bitbucket_dataset('repos_app.csv')
 BITBUCKET_PRS = __get_bitbucket_dataset('pull_requests.csv')
 
 ENV_TAURUS_ARTIFACT_DIR = __get_taurus_artifacts_dir()

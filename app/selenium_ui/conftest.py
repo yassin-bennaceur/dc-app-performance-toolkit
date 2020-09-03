@@ -13,7 +13,8 @@ from selenium.webdriver.chrome.options import Options
 from util.conf import CONFLUENCE_SETTINGS, JIRA_SETTINGS, BITBUCKET_SETTINGS
 from util.project_paths import JIRA_DATASET_ISSUES, JIRA_DATASET_JQLS, JIRA_DATASET_KANBAN_BOARDS, \
     JIRA_DATASET_PROJECTS, JIRA_DATASET_SCRUM_BOARDS, JIRA_DATASET_USERS, BITBUCKET_USERS, BITBUCKET_PROJECTS, \
-    BITBUCKET_REPOS, BITBUCKET_PRS, CONFLUENCE_BLOGS, CONFLUENCE_PAGES, CONFLUENCE_USERS, ENV_TAURUS_ARTIFACT_DIR
+    BITBUCKET_REPOS, BITBUCKET_PRS, CONFLUENCE_BLOGS, CONFLUENCE_PAGES, CONFLUENCE_USERS, ENV_TAURUS_ARTIFACT_DIR, \
+    BITBUCKET_REPOS_APP
 
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
@@ -56,6 +57,7 @@ class Dataset:
             self.dataset["projects"] = self.__read_input_file(BITBUCKET_PROJECTS)
             self.dataset["users"] = self.__read_input_file(BITBUCKET_USERS)
             self.dataset["repos"] = self.__read_input_file(BITBUCKET_REPOS)
+            self.dataset["repos_app"] = self.__read_input_file(BITBUCKET_REPOS_APP)
             self.dataset["pull_requests"] = self.__read_input_file(BITBUCKET_PRS)
         return self.dataset
 

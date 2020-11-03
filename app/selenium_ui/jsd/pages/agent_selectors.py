@@ -29,6 +29,9 @@ class UrlManager:
     def browse_all_projects_url(self):
         return f'{self.host}{self.browse_all_projects}'
 
+    def browse_request(self):
+        return f'{self.host}/browse/'
+
 
 class LoginPageLocators:
     login_url = UrlManager().login_url()
@@ -61,3 +64,11 @@ class BrowseProjectsLocators:
 
     brows_projects_url = UrlManager().browse_all_projects_url()
     page_title = (By.XPATH, "//h1[contains(text(),'Browse projects')]")
+
+
+class BrowseRequestLocators:
+
+    request_summary = (By.ID, "summary-val")
+    invite_team_icon = (By.CLASS_NAME, ".icon-sidebar-invite-team")
+    invite_team_textarea = (By.ID, "js-invite-team-textarea")
+    invite_team_button = (By.CLASS_NAME, ".js-invite-team-main-button")

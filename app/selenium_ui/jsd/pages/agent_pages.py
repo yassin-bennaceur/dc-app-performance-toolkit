@@ -1,7 +1,7 @@
 from selenium_ui.base_page import BasePage
 from selenium.webdriver.common.keys import Keys
 from selenium_ui.jsd.pages.agent_selectors import LoginPageLocators, PopupLocators, DashboardLocators, LogoutLocators, \
-    BrowseProjectsLocators
+    BrowseProjectsLocators, UrlManager, BrowseRequestLocators
 
 
 class PopupManager(BasePage):
@@ -46,3 +46,19 @@ class BrowseProjects(BasePage):
 
     def wait_for_page_loaded(self):
         self.wait_until_visible(BrowseProjectsLocators.page_title)
+
+
+class BrowseRequest(BasePage):
+
+    def go_to(self, project_key):
+        self.driver.get(UrlManager().browse_request()+project_key)
+
+    def wait_for_page_loaded(self):
+        self.wait_until_visible(BrowseRequestLocators.request_summary)
+
+    def invite_team(self, user_to_invite):
+        self.get_element(BrowseRequestLocators.invite_team_icon).click()
+        text_area = self.wait_until_clickable(BrowseRequestLocators.invite_team_textarea).send_keys(user_to_invite)
+        text_area.submit()
+        self.wait_until_clickable(BrowseRequestLocators.invite_team_button).click()
+        self.wait_until_invisible(BrowseRequestLocators.invite_team_button)

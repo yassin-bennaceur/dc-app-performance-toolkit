@@ -1,6 +1,6 @@
 from selenium_ui.conftest import print_timing
 from util.conf import JSD_SETTINGS
-from selenium_ui.jsd.pages.agent_pages import Login, PopupManager, Logout, BrowseProjects
+from selenium_ui.jsd.pages.agent_pages import Login, PopupManager, Logout, BrowseProjects, BrowseRequest
 import random
 
 REQUESTS = "requests"
@@ -67,3 +67,23 @@ def browse_projects_list(webdriver, datasets):
         browse_projects_page.go_to()
         browse_projects_page.wait_for_page_loaded()
     measure()
+
+
+def invite_team(webdriver, datasets):
+    project_key = random.choice([key[1] for key in datasets['requests']])
+    random_customer = random.choice([user[0] for user in datasets['customers']])
+    browse_request_page = BrowseRequest(webdriver)
+
+    @print_timing('selenium_invite_team:browse_request_page')
+    def measure():
+        browse_request_page.go_to(project_key)
+        browse_request_page.wait_for_page_loaded()
+
+        @print_timing('selenium_invite_team:invite_team')
+        def sub_measure():
+            browse_request_page.invite_team(random_customer)
+        sub_measure()
+    measure()
+
+
+

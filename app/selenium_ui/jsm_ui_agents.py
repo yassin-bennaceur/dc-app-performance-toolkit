@@ -24,22 +24,22 @@ def test_1_selenium_agent_view_customer_request(jsm_webdriver, jsm_datasets, jsm
     modules_agents.view_customer_request(jsm_webdriver, jsm_datasets)
 
 
-def test_1_selenium_agent_view_workload_report_medium(jsm_webdriver, jsm_datasets, jsm_screen_shots):
-    if is_dataset_small(jsm_datasets):
-        pytest.skip("Dataset does not have medium (10k-100k requests) service desk. Skipping action.")
-    modules_agents.view_workload_report_medium(jsm_webdriver, jsm_datasets)
+# def test_1_selenium_agent_view_workload_report_medium(jsm_webdriver, jsm_datasets, jsm_screen_shots):
+#     if is_dataset_small(jsm_datasets):
+#         pytest.skip("Dataset does not have medium (10k-100k requests) service desk. Skipping action.")
+#     modules_agents.view_workload_report_medium(jsm_webdriver, jsm_datasets)
 
 
-def test_1_selenium_agent_view_time_to_resolution_report_medium(jsm_webdriver, jsm_datasets, jsm_screen_shots):
-    if is_dataset_small(jsm_datasets):
-        pytest.skip("Dataset does not have medium (10k-100k requests) service desk. Skipping action.")
-    modules_agents.view_time_to_resolution_report_medium(jsm_webdriver, jsm_datasets)
+# def test_1_selenium_agent_view_time_to_resolution_report_medium(jsm_webdriver, jsm_datasets, jsm_screen_shots):
+#     if is_dataset_small(jsm_datasets):
+#         pytest.skip("Dataset does not have medium (10k-100k requests) service desk. Skipping action.")
+#     modules_agents.view_time_to_resolution_report_medium(jsm_webdriver, jsm_datasets)
 
 
-def test_1_selenium_agent_view_created_vs_resolved_report_medium(jsm_webdriver, jsm_datasets, jsm_screen_shots):
-    if is_dataset_small(jsm_datasets):
-        pytest.skip("Dataset does not have medium (10k-100k requests) service desk. Skipping action.")
-    modules_agents.view_created_vs_resolved_report_medium(jsm_webdriver, jsm_datasets)
+# def test_1_selenium_agent_view_created_vs_resolved_report_medium(jsm_webdriver, jsm_datasets, jsm_screen_shots):
+#     if is_dataset_small(jsm_datasets):
+#         pytest.skip("Dataset does not have medium (10k-100k requests) service desk. Skipping action.")
+#     modules_agents.view_created_vs_resolved_report_medium(jsm_webdriver, jsm_datasets)
 
 
 def test_1_selenium_agent_view_workload_report_small(jsm_webdriver, jsm_datasets, jsm_screen_shots):
@@ -58,10 +58,10 @@ def test_1_selenium_agent_add_request_comment(jsm_webdriver, jsm_datasets, jsm_s
     modules_agents.add_request_comment(jsm_webdriver, jsm_datasets)
 
 
-def test_1_selenium_agent_view_queue_all_open_medium_project(jsm_webdriver, jsm_datasets, jsm_screen_shots):
-    if is_dataset_small(jsm_datasets):
-        pytest.skip("Dataset does not have medium (10k-100k requests) service desk. Skipping action.")
-    modules_agents.view_queue_medium_project(jsm_webdriver, jsm_datasets)
+# def test_1_selenium_agent_view_queue_all_open_medium_project(jsm_webdriver, jsm_datasets, jsm_screen_shots):
+#     if is_dataset_small(jsm_datasets):
+#         pytest.skip("Dataset does not have medium (10k-100k requests) service desk. Skipping action.")
+#     modules_agents.view_queue_medium_project(jsm_webdriver, jsm_datasets)
 
 
 def test_1_selenium_agent_view_queue_all_open_small_project(jsm_webdriver, jsm_datasets, jsm_screen_shots):

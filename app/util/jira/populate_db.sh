@@ -76,7 +76,7 @@ if [[ ${jsm} == 1 && ${small} == 1 ]]; then
   # Only JSM supports "small" dataset
   DATASETS_SIZE="small"
 fi
-DB_DUMP_NAME="db.dump"
+DB_DUMP_NAME="db_unresolved.dump"
 DB_DUMP_URL="${DATASETS_AWS_BUCKET}/${JIRA_VERSION}/${DATASETS_SIZE}/${DB_DUMP_NAME}"
 
 ###################    End of variables section  ###################

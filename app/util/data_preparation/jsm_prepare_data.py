@@ -1,10 +1,10 @@
+import datetime
 import functools
-import multiprocessing
 import random
 import string
 from datetime import timedelta
 from timeit import default_timer as timer
-import datetime
+
 import urllib3
 
 from util.api.abstract_clients import JSM_EXPERIMENTAL_HEADERS
@@ -45,8 +45,8 @@ REQUEST_TYPES_NAMES = ['Technical support', 'Licensing and billing questions', '
 
 performance_agents_count = JSM_SETTINGS.agents_concurrency
 performance_customers_count = JSM_SETTINGS.customers_concurrency
-num_cores = multiprocessing.cpu_count()
 
+# TODO why do we do this?
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
@@ -59,10 +59,12 @@ def print_timing(message):
             start = timer()
             result = func(*args, **kwargs)
             end = timer()
-            print(f"{message} finished in {timedelta(seconds=end-start)} seconds")
+            print(f"{message} finished in {timedelta(seconds=end - start)} seconds")
             print('------------------------------------------------------')
             return result
+
         return wrapper
+
     return deco_wrapper
 
 
@@ -117,12 +119,13 @@ def __get_customers_with_requests(jira_client, jsm_client, count):
         start_at = start_at + max_count_iteration
         customer_chunks = [customers[x:x + customers_chunk_size]
                            for x in range(0, len(customers), customers_chunk_size)]
-        pool = multiprocessing.pool.ThreadPool(processes=num_cores)  # Can be increased to improve script speed
 
         for customer_chunk in customer_chunks:
             if len(customers_with_requests) >= count:
                 break
-            customers_datas = pool.starmap(__filter_customer_with_requests, [(i, jsm_client) for i in customer_chunk])
+
+            customers_datas = [__filter_customer_with_requests(customer, jsm_client) for customer in customer_chunk]
+
             for customer_data in customers_datas:
                 if customer_data['has_requests']:
                     if len(customers_with_requests) >= count:
@@ -213,14 +216,14 @@ def generate_users(api, num_to_create, application_keys, prefix_name):
 
 def __get_service_desk_info(jira_api, jsm_api, service_desk):
     # Run in parallel 'get_total_issues_count', 'get_queue' and '__get_service_desk_reports'.
-    pool = multiprocessing.pool.ThreadPool(processes=3)
-    p1 = pool.apply_async(jira_api.get_total_issues_count, kwds={'jql': f'project = {service_desk["projectKey"]}'})
-    p2 = pool.apply_async(jsm_api.get_queue, kwds={'service_desk_id': service_desk['id']})
-    p3 = pool.apply_async(__get_service_desk_reports, kwds={'service_desk': service_desk, 'jsm_api': jsm_api})
 
-    service_desk_requests_count = str(p1.get())
-    service_desk_queues = p2.get()
-    service_desk_reports = p3.get()
+    p1 = jira_api.get_total_issues_count(f'project = {service_desk["projectKey"]}')
+    p2 = jsm_api.get_queue(service_desk_id=service_desk['id'])
+    p3 = __get_service_desk_reports(jsm_api, service_desk)
+
+    service_desk_requests_count = str(p1)
+    service_desk_queues = p2
+    service_desk_reports = p3
 
     all_open_queue_id = [queue['id'] for queue in service_desk_queues if queue['name'] == 'All open']
     if not all_open_queue_id:
@@ -237,9 +240,9 @@ def __get_service_desk_info(jira_api, jsm_api, service_desk):
 def __get_service_desks(jsm_api, jira_api, service_desks):
     now = datetime.datetime.now()
     print(f'Service desks start {now.strftime("%H:%M:%S")}')
-    pool = multiprocessing.pool.ThreadPool(processes=num_cores*2)
-    service_desks_with_requests = pool.starmap(__get_service_desk_info, [(jira_api, jsm_api, service_desk)
-                                               for service_desk in service_desks])
+
+    service_desks_with_requests = [__get_service_desk_info(jira_api, jsm_api, service_desk) for service_desk in
+                                   service_desks]
 
     print(f"Retrieved {len(service_desks)} Jira Service Desks")
     large_service_desks = []
@@ -314,13 +317,14 @@ def __get_requests(jira_api, service_desks, requests_without_distribution):
     issues_distribution_perc = __calculate_issues_per_project(len(service_desks))
     issues_distribution_id = {}
     for key, value in issues_distribution_perc.items():
-        issues_distribution_id[service_desks_issues[key-1]['projectKey']] = value
+        issues_distribution_id[service_desks_issues[key - 1]['projectKey']] = value
 
     print(f'Start retrieving issues by distribution per project: {issues_distribution_id}')
     distribution_success = True
-    pool = multiprocessing.pool.ThreadPool(processes=num_cores)
-    issues_list = pool.starmap(__get_service_desk_requests, [(jira_api, issues_distribution_id, i)
-                                                             for i in service_desks_issues])
+
+    issues_list = [__get_service_desk_requests(jira_api, issues_distribution_id, issue) for issue in
+                   service_desks_issues]
+
     # Check if requests distribution per service desk is success
     for service_desk in issues_list:
         if not service_desk['distribution_success']:
@@ -386,9 +390,8 @@ def __get_service_desk_request_types(jsm_api, service_desk):
 
 
 def __get_request_types(jsm_api, service_desks):
-    pool = multiprocessing.pool.ThreadPool(processes=num_cores * 2)
-    requests_ids = pool.starmap(__get_service_desk_request_types,
-                                [(jsm_api, service_desk) for service_desk in service_desks])
+    requests_ids = [__get_service_desk_request_types(jsm_api, service_desk) for service_desk in service_desks]
+
     requests_ids = sum(requests_ids, [])
     request_types_list = []
     for request_id in requests_ids:
@@ -432,23 +435,18 @@ def __create_data_set(jira_client, jsm_client):
     requests = jira_client.issues_search_parallel(jql=f"project in ({projects_keys})",
                                                   max_results=TOTAL_ISSUES_TO_RETRIEVE)
 
-    pool = multiprocessing.pool.ThreadPool(processes=num_cores)
-    agents_pool = pool.apply_async(__get_agents, kwds={'jira_client': jira_client})
-    customers_pool = pool.apply_async(__get_customers, kwds={'jira_client': jira_client, 'jsm_client': jsm_client})
-    requests_pool = pool.apply_async(__get_requests, kwds={'jira_api': jira_client,
-                                                           'service_desks': service_desks,
-                                                           'requests_without_distribution': requests})
-    service_desks_pool = pool.apply_async(__get_service_desks, kwds={'jsm_api': jsm_client,
-                                                                     'jira_api': jira_client,
-                                                                     'service_desks': service_desks})
+    agents_pool = __get_agents(jira_client)
+    customers_pool = __get_customers(jira_client, jsm_client)
+    requests_pool = __get_requests(jira_client, service_desks, requests)
+    service_desks_pool = __get_service_desks(jsm_client, jira_client, service_desks)
 
-    dataset[AGENTS] = agents_pool.get()
-    dataset[CUSTOMERS] = customers_pool.get()
-    dataset[REQUESTS] = requests_pool.get()
-    dataset[SERVICE_DESKS_LARGE], dataset[SERVICE_DESKS_MEDIUM], dataset[SERVICE_DESKS_SMALL] = service_desks_pool.get()
-    requests_types = pool.apply_async(__get_request_types, kwds={'jsm_api': jsm_client,
-                                                                 'service_desks': service_desks})
-    dataset[REQUEST_TYPES] = requests_types.get()
+    dataset[AGENTS] = agents_pool
+    dataset[CUSTOMERS] = customers_pool
+    dataset[REQUESTS] = requests_pool
+    dataset[SERVICE_DESKS_LARGE], dataset[SERVICE_DESKS_MEDIUM], dataset[SERVICE_DESKS_SMALL] = service_desks_pool
+    requests_types = __get_request_types(jsm_client, service_desks)
+
+    dataset[REQUEST_TYPES] = requests_types
     dataset[CUSTOM_ISSUES] = __get_custom_issues(jira_client, jsm_client, JSM_SETTINGS.custom_dataset_query)
 
     return dataset

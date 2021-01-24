@@ -15,8 +15,8 @@ def main():
 
 
 def __get_results_dir() -> Path:
-    path = (Path(__file__).absolute().parents[1] / "results" / "reports" /
-            datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+    #path = (Path(__file__).absolute().parents[1] / "results" / "reports" /            datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+    #path = (Path(__file__).absolute().parents[1] / "results" / "jira" / "diff"
     path.mkdir(parents=True, exist_ok=True)
     return path
 

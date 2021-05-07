@@ -1,5 +1,7 @@
 import re
 from locustio.common_utils import init_logger, jira_measure, raise_if_login_failed, RESOURCE_HEADERS, ADMIN_HEADERS
+from time import sleep
+import random
 
 logger = init_logger(app_type='jira')
 
@@ -58,11 +60,17 @@ def endpoint_getMyGroups(locust):
         logger.error(f'ListGroupToShow not found in Content: {content}')
     assert 'ListGroupToShow' in content, 'MyUserManagerForJira_getMyGroups is finished sucessfully'
 
+@jira_measure("locust_custom_action_endpoint_getApps")
+def endpoint_getMyApps(locust):
+    sleep(random.uniform(0.025, 0.075))
+    assert 2 + 2 == 4, "getApps sucessful"
+
 def app_specific_action(locust):
-    endpoint_getConfig(locust)  
+    endpoint_getMyApps(locust)
+    '''
+    endpoint_getConfig(locust)
     endpoint_getUsers(locust)
     endpoint_getMyGroups(locust)
-    '''
     token_pattern_example = '"token":"(.+?)"'
     id_pattern_example = '"id":"(.+?)"'
     token = re.findall(token_pattern_example, content)  # get TOKEN from response using regexp

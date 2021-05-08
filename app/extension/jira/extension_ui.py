@@ -21,6 +21,7 @@ def app_specific_action(webdriver, datasets):
         sub_measure1()
     measure()
 '''
+'''
 def app_specific_action_filterUsers(webdriver, datasets):
     page = BasePage(webdriver)
     @print_timing("selenium_app_custom_action_filterUsers")
@@ -55,5 +56,16 @@ def app_specific_action_mySettings(webdriver, datasets):
             page.go_to_url(f"{JIRA_SETTINGS.server_url}/plugins/servlet/myusermanagerforjira/configuration")
             page.wait_until_visible((By.ID, "lastLoginInDays"))  # Wait for userTable visible
             #page.wait_until_visible((By.ID, "ID_OF_YOUR_APP_SPECIFIC_UI_ELEMENT"))  # Wait for you app-specific UI element by ID selector
+        sub_measure()
+    measure()
+'''
+def app_specific_action_showMyApps(webdriver, datasets):
+    page = BasePage(webdriver)
+    @print_timing("selenium_app_custom_action_mySettings")
+    def measure():
+        #@print_timing("selenium_app_custom_action:MyPluginManagerForJira showMyApps")
+        def sub_measure():
+            page.go_to_url(f"{JIRA_SETTINGS.server_url}/plugins/servlet/myconfiguration/adminpluginmanager")
+            #page.wait_until_visible((By.ID, "myJobStatusProgressbar"))  # Wait for UI Element visible
         sub_measure()
     measure()
